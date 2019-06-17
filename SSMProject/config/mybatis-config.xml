@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- 引入外部的属性文件 -->
+	<properties resource="db.properties"></properties>
+	
+	<!-- 开启驼峰命名 -->
+	<settings>
+		<setting name="mapUnderscoreToCamelCase" value="true" />
+		<setting name="lazyLoadingEnabled" value="true" />
+		<!-- 启用延迟加载查询的策略,在分部查询的基础上才能起作用 -->
+		<setting name="mapUnderscoreToCamelCase" value="true" />
+		<setting name="aggressiveLazyLoading" value="false" />
+
+	</settings>
+	<!--指定类型处理器在处理customerstatus的时候
+	<typeHandlers >
+		<typeHandler handler="zhang.mybatis.typehanders.MyCustomerStatusTypeHander" javaType="zhang.mybatis.entities.CustomerStatus"/>
+	</typeHandlers>
+	 -->
+	<plugins>
+		<!-- 使用分页的插件 -->
+		<plugin interceptor="com.github.pagehelper.PageHelper">
+			<!-- 使用下面的方式配置参数，后面会有所有的参数介绍 -->
+			<property name="dialect" value="mysql" />
+		</plugin>
+		<!-- 
+		<plugin interceptor="zhang.mybatis.Interceptors.MyFirsterInterceptor">
+			<property name="username" value="zhangyukang" />
+			<property name="password" value="123456" />
+		</plugin>
+		 -->
+	</plugins>
+	<!-- 配置坏境 -->
+	<environments default="dev_mysql">
+		<environment id="dev_mysql">
+			<!-- 配置事务管理器 -->
+			<transactionManager type="JDBC"></transactionManager>
+			<!-- 配置数据源 -->
+			<dataSource type="POOLED">
+				<property name="driver" value="${jdbc.driverclass}" />
+				<property name="url" value="${jdbc.url}" />
+				<property name="username" value="${jdbc.username}" />
+				<property name="password" value="${jdbc.password}" />
+			</dataSource>
+		</environment>
+		<environment id="dev_orcle">
+			<!-- 配置事务管理器 -->
+			<transactionManager type="JDBC"></transactionManager>
+			<!-- 配置数据源 -->
+			<dataSource type="POOLED">
+				<property name="driver" value="${oracle.driverclass}" />
+				<property name="url" value="${oracle.url}" />
+				<property name="username" value="${oracle.username}" />
+				<property name="password" value="${oracle.password}" />
+			</dataSource>
+		</environment>
+	</environments>
+	<!-- 配置连接多种数据库 -->
+	<databaseIdProvider type="DB_VENDOR">
+		<!-- 注意此处容易出错:原因将MySQL写成了Mysql -->
+		<property name="MySQL" value="mysql" />
+		<property name="SQL Server" value="sqlserver" />
+		<property name="DB2" value="db2" />
+		<property name="Oracle" value="oracle" />
+	</databaseIdProvider>
+
+	<!-- 映sql映射文件 -->
+	<mappers>
+		<!-- 批量注册sql映射文件 -->
+		<package name="zhang.ssm.dao" />
+	</mappers>
+
+</configuration>

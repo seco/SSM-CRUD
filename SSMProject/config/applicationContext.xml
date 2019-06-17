@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+	<!-- 配合需要扫描的包 -->
+	<context:component-scan base-package="zhang.ssm" use-default-filters="true">
+	</context:component-scan>
+	<!-- 引入外部的属性文件 -->
+	<context:property-placeholder location="classpath:db.properties" />
+	<!-- 配置数据源 -->
+	<bean id="datasource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="user" value="${jdbc.username}"></property>
+		<property name="driverClass" value="${jdbc.driverclass}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+		<property name="jdbcUrl" value="${jdbc.url}"></property>
+	</bean>
+	<!-- 配置sqlsessionfactory -->
+	<bean  id="sqlSessionFactoryBean"
+	class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="datasource"></property>
+		<property name="configLocation" value="classpath:mybatis-config.xml"></property>
+		<!-- 引入mapper,xml文件 -->
+		<property name="mapperLocations" value="classpath:zhang/ssm/mapper/*.xml"></property>
+	</bean>
+	<!-- 引入Mapper接口 -->
+	<mybatis-spring:scan base-package="zhang.ssm.dao"/>
+	<!-- 配置事务管理器 -->
+	<bean id="transactionManager"
+	class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="datasource"></property>
+	</bean>
+	<!-- 配置事务的属性 -->
+	<tx:advice id="txadvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="find*"  read-only="true"/>
+			<tx:method name="get*" read-only="true"/>
+			<tx:method name="*"/>
+		</tx:attributes>
+	</tx:advice>
+	<!-- 配置切点,将事务的属性和切点关联起来 -->
+	<aop:config>
+		<aop:pointcut expression="execution(* zhang.ssm.service.*.*(..))" id="mypointcut"/>
+		<aop:advisor advice-ref="txadvice" pointcut-ref="mypointcut"/>
+	</aop:config>
+</beans>
